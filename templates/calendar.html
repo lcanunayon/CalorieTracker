@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Calendar — {{ year }}-{{ '%02d'|format(month) }}</h2>
+  <div class="calendar-grid card">
+    <div class="calendar-head">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="calendar-body">
+      {% for week in weeks %}
+        {% for day in week %}
+          <div class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}">
+            <div class="cell-top">
+              <span class="daynum">{{ day.date.day }}</span>
+              <span class="total">{{ day.total }} kcal</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}

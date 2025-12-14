@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <h2 class="hero-title">Track your daily calories with ease</h2>
+        <p class="hero-sub">Upload a photo or enter calories manually. View your progress on the calendar.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/upload/breakfast">Log Breakfast</a>
+          <a class="btn btn-outline" href="/calendar">View Calendar</a>
+        </div>
+      </div>
+      <div class="hero-right card">
+        <div class="day-summary">
+          <div class="day-title">Today — {{ date.isoformat() }}</div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="label">Breakfast</div>
+              <div class="value">{{ totals.breakfast }} kcal</div>
+            </div>
+            <div class="summary-item">
+              <div class="label">Lunch</div>
+              <div class="value">{{ totals.lunch }} kcal</div>
+            </div>
+            <div class="summary-item">
+              <div class="label">Dinner</div>
+              <div class="value">{{ totals.dinner }} kcal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="entries-section">
+    <h3>Entries</h3>
+    {% if entries %}
+      <div class="entries-grid">
+        {% for e in entries %}
+          <article class="entry card">
+            {% if e.image_filename %}
+              <img class="entry-photo" src="/uploads/{{ e.image_filename }}" alt="photo">
+            {% endif %}
+            <div class="entry-body">
+              <div class="entry-top">
+                <div class="entry-meal">{{ e.meal.title() }}</div>
+                <div class="entry-cal">{{ e.calories }} kcal</div>
+              </div>
+              <div class="entry-desc">{{ e.food_estimate }} {{ e.notes }}</div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No entries yet for today. Start by logging a meal.</p>
+    {% endif %}
+  </section>
+
+{% endblock %}

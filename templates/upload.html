@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Log {{ meal.title() }}</h2>
+  <div class="card form-card">
+    <form method="post" enctype="multipart/form-data">
+      <label>Date
+        <input type="date" name="date" value="{{ date }}">
+      </label>
+      <label>Photo
+        <input type="file" name="photo" accept="image/*">
+      </label>
+      <label>Manual Calories (optional)
+        <input type="number" name="manual_cal">
+      </label>
+      <label>Notes
+        <input type="text" name="notes">
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-ghost" href="/">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <p class="muted">Tip: Upload a clear photo of the main food item. The estimator uses filename heuristics; you can override calories manually.</p>
+{% endblock %}
