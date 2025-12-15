@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Edit Entry</h2>
+  <div class="card form-card">
+    <form method="post" enctype="multipart/form-data">
+      <label>Date
+        <input type="date" name="date" value="{{ entry.date }}">
+      </label>
+      <label>Meal
+        <select name="meal">
+          <option value="breakfast" {% if entry.meal=='breakfast' %}selected{% endif %}>Breakfast</option>
+          <option value="lunch" {% if entry.meal=='lunch' %}selected{% endif %}>Lunch</option>
+          <option value="dinner" {% if entry.meal=='dinner' %}selected{% endif %}>Dinner</option>
+        </select>
+      </label>
+      <label>Photo (replace)
+        <input type="file" name="photo" accept="image/*">
+      </label>
+      <label>Manual Calories
+        <input type="number" name="manual_cal" value="{{ entry.calories }}">
+      </label>
+      <label>Notes
+        <input type="text" name="notes" value="{{ entry.notes }}">
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-ghost" href="/day/{{ entry.date }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

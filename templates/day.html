@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Entries for {{ date.isoformat() }}</h2>
+
+  <div class="card">
+    <div class="day-summary">
+      <div class="summary-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="summary-item"><div class="label">Breakfast</div><div class="value">{{ totals.breakfast }} kcal</div></div>
+        <div class="summary-item"><div class="label">Lunch</div><div class="value">{{ totals.lunch }} kcal</div></div>
+        <div class="summary-item"><div class="label">Dinner</div><div class="value">{{ totals.dinner }} kcal</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <a class="btn btn-primary" href="/upload/breakfast?date={{ date.isoformat() }}">Add Breakfast</a>
+    <a class="btn btn-primary" href="/upload/lunch?date={{ date.isoformat() }}">Add Lunch</a>
+    <a class="btn btn-primary" href="/upload/dinner?date={{ date.isoformat() }}">Add Dinner</a>
+  </div>
+
+  <section class="entries-section" style="margin-top:14px;">
+    {% if entries %}
+      <div class="entries-grid">
+        {% for e in entries %}
+          <article class="entry card">
+            {% if e.image_filename %}
+              <img class="entry-photo" src="/uploads/{{ e.image_filename }}" alt="photo">
+            {% endif %}
+            <div class="entry-body">
+              <div class="entry-top">
+                <div class="entry-meal">{{ e.meal.title() }}</div>
+                <div class="entry-cal">{{ e.calories }} kcal</div>
+              </div>
+              <div class="entry-desc">{{ e.food_estimate }} {{ e.notes }}</div>
+              <div style="margin-top:8px;display:flex;gap:8px;">
+                <a class="btn btn-outline" href="/entry/{{ e.id }}/edit">Edit</a>
+                <form method="post" action="/entry/{{ e.id }}/delete" onsubmit="return confirm('Delete this entry?');">
+                  <button type="submit" class="btn btn-ghost">Delete</button>
+                </form>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No entries for this day.</p>
+    {% endif %}
+  </section>
+
+{% endblock %}

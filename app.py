@@ -116,5 +116,68 @@ def calendar_view():
     return render_template('calendar.html', year=year, month=month, weeks=weeks)
 
 
+@app.route('/day/<date>')
+def day_view(date):
+    # date expected as ISO yyyy-mm-dd
+    try:
+        dt = datetime.date.fromisoformat(date)
+    except Exception:
+        flash('Invalid date')
+        return redirect(url_for('calendar_view'))
+    entries = Entry.query.filter(Entry.date == date).all()
+    totals = { 'breakfast': 0, 'lunch': 0, 'dinner': 0 }
+    for e in entries:
+        totals[e.meal] = totals.get(e.meal, 0) + (e.calories or 0)
+    return render_template('day.html', date=dt, entries=entries, totals=totals)
+
+
+@app.route('/entry/<int:entry_id>/edit', methods=['GET', 'POST'])
+def edit_entry(entry_id):
+    entry = Entry.query.get_or_404(entry_id)
+    if request.method == 'POST':
+        entry.date = request.form.get('date') or entry.date
+        entry.meal = request.form.get('meal') or entry.meal
+        manual_cal = request.form.get('manual_cal')
+        if manual_cal:
+            try:
+                entry.calories = int(manual_cal)
+            except ValueError:
+                pass
+        entry.notes = request.form.get('notes') or entry.notes
+        # handle new photo upload
+        f = request.files.get('photo')
+        if f and f.filename:
+            filename = secure_filename(f.filename)
+            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            f.save(path)
+            entry.image_filename = filename
+            predicted, predicted_cal, conf = estimate_calories(path)
+            if not manual_cal and predicted_cal:
+                entry.calories = predicted_cal
+            entry.food_estimate = predicted or entry.food_estimate
+
+        db.session.commit()
+        flash('Entry updated')
+        return redirect(url_for('day_view', date=entry.date))
+
+    return render_template('edit.html', entry=entry)
+
+
+@app.route('/entry/<int:entry_id>/delete', methods=['POST'])
+def delete_entry(entry_id):
+    entry = Entry.query.get_or_404(entry_id)
+    date = entry.date
+    # remove image file optionally
+    if entry.image_filename:
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], entry.image_filename))
+        except Exception:
+            pass
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Entry deleted')
+    return redirect(url_for('day_view', date=date))
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

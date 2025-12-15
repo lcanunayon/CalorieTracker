@@ -9,12 +9,12 @@
     <div class="calendar-body">
       {% for week in weeks %}
         {% for day in week %}
-          <div class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}">
+          <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}" href="/day/{{ day.date.isoformat() }}">
             <div class="cell-top">
               <span class="daynum">{{ day.date.day }}</span>
               <span class="total">{{ day.total }} kcal</span>
             </div>
-          </div>
+          </a>
         {% endfor %}
       {% endfor %}
     </div>
