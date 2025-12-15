@@ -22,18 +22,20 @@ document.addEventListener('DOMContentLoaded', function(){
   })
 
   // Intercept form submissions to animate before submit
+  // NOTE: submit handler will animate then submit the form normally.
+  // Avoid navigating via `location.assign` before form.submit() to preserve POST bodies.
   document.querySelectorAll('form').forEach(function(form){
     form.addEventListener('submit', function(ev){
-      // For destructive actions (delete) allow confirm to run
-      // Let the form submit normally but animate
-      const action = form.getAttribute('action') || location.href
+      // Allow confirm() dialogs to work if present
+      // Prevent immediate navigation so we can run the exit animation first
       ev.preventDefault()
-      // small timeout to allow any confirm dialog to resolve
-      setTimeout(function(){
-        animateAndNavigate(action)
-        // submit after navigation delay to allow server to handle
-        setTimeout(function(){ form.submit() }, 240)
-      }, 10)
+      const root = document.getElementById('site-root')
+      if(root){
+        root.classList.remove('page-enter')
+        root.classList.add('page-exit')
+      }
+      // Submit after a short delay so the animation is visible and the POST body is preserved
+      setTimeout(function(){ form.submit() }, 200)
     })
   })
 

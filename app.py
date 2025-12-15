@@ -1,6 +1,8 @@
 import os
 import datetime
 import calendar as pycalendar
+import uuid
+from sqlalchemy.pool import NullPool
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from extensions import db
 from werkzeug.utils import secure_filename
@@ -12,9 +14,32 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# file upload settings
+ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.bmp'}
+
+
+def _allowed_file(filename):
+    if not filename:
+        return False
+    _, ext = os.path.splitext(filename.lower())
+    return ext in ALLOWED_EXTENSIONS
+
+
+def _unique_filename(original_filename: str) -> str:
+    # generate a short unique name while preserving extension
+    name = secure_filename(original_filename)
+    base, ext = os.path.splitext(name)
+    unique = uuid.uuid4().hex
+    return f"{unique}{ext}"
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# SQLite engine options: allow connections across threads and avoid pooled writes
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'connect_args': { 'check_same_thread': False },
+    'poolclass': NullPool,
+}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret')
 
@@ -27,7 +52,13 @@ login_manager.init_app(app)
 with app.app_context():
     # import models after db is initialized to avoid circular imports
     from models import Entry, User
-    db.create_all()
+    try:
+        db.create_all()
+    except Exception as e:
+        # avoid crashing at import time; show helpful message
+        import traceback
+        traceback.print_exc()
+        print('WARNING: could not create DB schema automatically:', e)
 
 
 @login_manager.user_loader
@@ -115,7 +146,10 @@ def upload(meal):
         predicted_cal = None
 
         if f and f.filename:
-            filename = secure_filename(f.filename)
+            if not _allowed_file(f.filename):
+                flash('File type not allowed')
+                return redirect(request.url)
+            filename = _unique_filename(f.filename)
             path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(path)
             predicted, predicted_cal, confidence = estimate_calories(path)
@@ -215,7 +249,10 @@ def edit_entry(entry_id):
         # handle new photo upload
         f = request.files.get('photo')
         if f and f.filename:
-            filename = secure_filename(f.filename)
+            if not _allowed_file(f.filename):
+                flash('File type not allowed')
+                return redirect(request.url)
+            filename = _unique_filename(f.filename)
             path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(path)
             entry.image_filename = filename
@@ -240,7 +277,9 @@ def delete_entry(entry_id):
     # remove image file optionally
     if entry.image_filename:
         try:
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], entry.image_filename))
+            fpath = os.path.join(app.config['UPLOAD_FOLDER'], entry.image_filename)
+            if os.path.exists(fpath):
+                os.remove(fpath)
         except Exception:
             pass
     db.session.delete(entry)
