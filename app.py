@@ -5,6 +5,8 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from extensions import db
 from werkzeug.utils import secure_filename
 from utils import estimate_calories
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
@@ -14,21 +16,80 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = 'dev-secret'
+app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret')
 
 # initialize extensions
 db.init_app(app)
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 
 with app.app_context():
     # import models after db is initialized to avoid circular imports
-    from models import Entry
+    from models import Entry, User
     db.create_all()
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    from models import User
+    try:
+        return User.query.get(int(user_id))
+    except Exception:
+        return None
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    from models import User
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if not username or not password:
+            flash('Username and password required')
+            return redirect(url_for('register'))
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists')
+            return redirect(url_for('register'))
+        user = User(username=username, password_hash=generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        flash('Registered and logged in')
+        return redirect(url_for('index'))
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    from models import User
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            flash('Logged in')
+            return redirect(url_for('index'))
+        flash('Invalid credentials')
+        return redirect(url_for('login'))
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out')
+    return redirect(url_for('login'))
+
+
 @app.route('/')
+@login_required
 def index():
+    from models import Entry
     today = datetime.date.today()
-    entries = Entry.query.filter(Entry.date == today.isoformat()).all()
+    entries = Entry.query.filter(Entry.date == today.isoformat(), Entry.user_id == current_user.id).all()
     totals = { 'breakfast': 0, 'lunch': 0, 'dinner': 0 }
     for e in entries:
         totals[e.meal] = totals.get(e.meal, 0) + (e.calories or 0)
@@ -36,6 +97,7 @@ def index():
 
 
 @app.route('/upload/<meal>', methods=['GET', 'POST'])
+@login_required
 def upload(meal):
     meal = meal.lower()
     if meal not in ('breakfast', 'lunch', 'dinner'):
@@ -69,7 +131,7 @@ def upload(meal):
         if calories is None and predicted_cal is not None:
             calories = predicted_cal
 
-        entry = Entry(date=date_str, meal=meal, food_estimate=predicted or '', calories=calories or 0, notes=notes or '', image_filename=filename)
+        entry = Entry(date=date_str, meal=meal, food_estimate=predicted or '', calories=calories or 0, notes=notes or '', image_filename=filename, user_id=current_user.id)
         db.session.add(entry)
         db.session.commit()
         flash('Logged ' + meal)
@@ -85,6 +147,7 @@ def uploaded_file(filename):
 
 
 @app.route('/calendar')
+@login_required
 def calendar_view():
     # show current month
     now = datetime.date.today()
@@ -95,7 +158,8 @@ def calendar_view():
 
     # aggregate totals per day
     totals_by_day = {}
-    for e in Entry.query.filter(Entry.date.like(f"{year}-%")).all():
+    from models import Entry
+    for e in Entry.query.filter(Entry.date.like(f"{year}-%"), Entry.user_id == current_user.id).all():
         try:
             d = datetime.date.fromisoformat(e.date)
         except Exception:
@@ -117,6 +181,7 @@ def calendar_view():
 
 
 @app.route('/day/<date>')
+@login_required
 def day_view(date):
     # date expected as ISO yyyy-mm-dd
     try:
@@ -124,7 +189,8 @@ def day_view(date):
     except Exception:
         flash('Invalid date')
         return redirect(url_for('calendar_view'))
-    entries = Entry.query.filter(Entry.date == date).all()
+    from models import Entry
+    entries = Entry.query.filter(Entry.date == date, Entry.user_id == current_user.id).all()
     totals = { 'breakfast': 0, 'lunch': 0, 'dinner': 0 }
     for e in entries:
         totals[e.meal] = totals.get(e.meal, 0) + (e.calories or 0)
@@ -132,8 +198,10 @@ def day_view(date):
 
 
 @app.route('/entry/<int:entry_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_entry(entry_id):
-    entry = Entry.query.get_or_404(entry_id)
+    from models import Entry
+    entry = Entry.query.filter_by(id=entry_id, user_id=current_user.id).first_or_404()
     if request.method == 'POST':
         entry.date = request.form.get('date') or entry.date
         entry.meal = request.form.get('meal') or entry.meal
@@ -164,8 +232,10 @@ def edit_entry(entry_id):
 
 
 @app.route('/entry/<int:entry_id>/delete', methods=['POST'])
+@login_required
 def delete_entry(entry_id):
-    entry = Entry.query.get_or_404(entry_id)
+    from models import Entry
+    entry = Entry.query.filter_by(id=entry_id, user_id=current_user.id).first_or_404()
     date = entry.date
     # remove image file optionally
     if entry.image_filename:

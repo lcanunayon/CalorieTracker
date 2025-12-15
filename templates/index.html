@@ -48,6 +48,12 @@
                 <div class="entry-cal">{{ e.calories }} kcal</div>
               </div>
               <div class="entry-desc">{{ e.food_estimate }} {{ e.notes }}</div>
+              <div style="margin-top:8px;display:flex;gap:8px;">
+                <a class="btn btn-outline" href="/entry/{{ e.id }}/edit">Edit</a>
+                <form method="post" action="/entry/{{ e.id }}/delete" onsubmit="return confirm('Delete this entry?');">
+                  <button type="submit" class="btn btn-ghost">Delete</button>
+                </form>
+              </div>
             </div>
           </article>
         {% endfor %}
