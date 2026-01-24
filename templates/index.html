@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  <style>
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    .hero-title.floating {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const heroTitle = document.querySelector('.hero-title');
+      if (heroTitle) {
+        heroTitle.classList.add('floating');
+      }
+    });
+  </script>
+
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-left">
