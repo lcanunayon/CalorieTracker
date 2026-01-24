@@ -59,15 +59,75 @@ body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;background:var(--bg-1
 .flashes{list-style:none;padding:0;margin:8px 0}
 .flashes li{background:#ecfdf5;border-left:4px solid var(--accent-2);padding:8px;border-radius:6px;color:#064e3b}
 
-/* Calendar grid */
-.calendar-grid{padding:12px}
-.calendar-head{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;color:var(--muted);font-weight:600}
-.calendar-body{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:10px}
-.calendar-cell{background:linear-gradient(180deg,#fff,#fbfdff);padding:10px;border-radius:10px;min-height:90px}
-.calendar-cell.other-month{opacity:0.5}
-.cell-top{display:flex;justify-content:space-between;align-items:center}
-.daynum{font-weight:700}
-.total{color:var(--accent);font-weight:600}
+/* Calendar navigation */
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.calendar-nav a {
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: bold;
+  padding: 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+.calendar-nav a:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* Calendar grid improvements */
+.calendar-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+}
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.calendar-cell {
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  padding: 10px;
+  border-radius: 10px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.calendar-cell:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.calendar-cell.other-month {
+  opacity: 0.5;
+}
+.cell-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.daynum {
+  font-weight: 700;
+}
+.total {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* page animation */
 .page-enter{animation:pageFadeIn .28s ease both}
