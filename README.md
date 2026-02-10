@@ -57,3 +57,7 @@ Next steps you might want me to do:
 - Add user accounts and export data as CSV
 - Improve food-calorie mapping and portion-size estimation
 - Integrate a cloud vision API for better recognition
+  
+- Uses Render to have website online. \/
+
+https://sunflower-a-calorie-tracker-by-angelo.onrender.com/
