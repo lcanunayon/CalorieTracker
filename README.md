@@ -1,4 +1,4 @@
-# CalorieTracker (Prototype)
+# Sunflower - a Calorie Tracker (Prototype)
 
 This is a small prototype Flask app that helps you log calories for breakfast, lunch, and dinner.
 
@@ -13,14 +13,41 @@ Requirements
 
 Quick start (PowerShell)
 ```powershell
-cd d:\CalorieTracker
+cd "d:\Repositories (Github)\Sunflower"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python app.py
 ```
 
-Open http://localhost:5000 in your browser.
+## Running the Server (PowerShell or CMD)
+
+To run the server locally, follow these steps:
+
+1. Open PowerShell or CMD.
+2. Navigate to the project directory:
+   ```powershell
+   cd "d:\Repositories (Github)\Sunflower"
+   ```
+3. Activate the virtual environment:
+   - For PowerShell:
+     ```powershell
+     .\.venv\Scripts\Activate.ps1
+     ```
+   - For CMD:
+     ```cmd
+     .\.venv\Scripts\activate.bat
+     ```
+4. Install the required dependencies:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+5. Start the Flask development server:
+   ```powershell
+   python app.py
+   ```
+
+6. Open your browser and go to [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 Notes & Limitations
 - The image-to-calorie mapping is heuristic: MobileNet class labels mapped to a small calorie table.

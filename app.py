@@ -288,5 +288,9 @@ def delete_entry(entry_id):
     return redirect(url_for('day_view', date=date))
 
 
+@app.route('/')
+def homepage():
+    return render_template('homepage.html')
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)

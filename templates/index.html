@@ -52,6 +52,83 @@
     </div>
   </section>
 
+  <section class="homepage">
+    <style>
+      .homepage {
+        font-family: 'Inter', sans-serif;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+      .homepage section {
+        margin-bottom: 40px;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .homepage h2 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .homepage p, .homepage li {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.6;
+      }
+      .homepage ul {
+        list-style: none;
+        padding: 0;
+      }
+      .homepage ul li {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        position: relative;
+      }
+      .homepage ul li:before {
+        content: '\2022';
+        color: #8f5009;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+      }
+      .homepage .image-placeholder {
+        width: 100%;
+        height: 200px;
+        background: #333;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+    </style>
+
+    <section class="features">
+      <h2>Features</h2>
+      <img src="/static/Assets/sunflower.avif" alt="Sunflower" class="image-placeholder">
+      <ul>
+        <li>Log your meals and track calories easily.</li>
+        <li>Upload photos of your food for automatic calorie estimation.</li>
+        <li>View your progress on a calendar.</li>
+      </ul>
+    </section>
+
+    <section class="how-to-use">
+      <h2>How to Use</h2>
+      <img src="/static/Assets/calendarscreenshot.jpg" alt="Sunflower" class="image-placeholder">
+      <ol>
+        <li>Register for an account or log in.</li>
+        <li>Log your meals by entering calorie values or uploading photos.</li>
+        <li>Check your daily and monthly progress on the calendar.</li>
+      </ol>
+    </section>
+
+    <section class="about">
+      <h2>About</h2>
+      <img src="/static/Assets/smilinguy.jpeg" alt="Sunflower" class="image-placeholder">
+      <p>Sunflower - a Calorie Tracker is a simple and intuitive app designed to help you monitor your daily calorie intake. Whether you're looking to maintain, lose, or gain weight, Sunflower provides the tools you need to stay on track.</p>
+    </section>
+  </section>
+
   <section class="entries-section">
     <h3>Entries</h3>
     {% if entries %}
