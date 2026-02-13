@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 from utils import estimate_calories
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from models import Entry
+print("ENTRY COUNT:", Entry.query.count())
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
@@ -60,6 +62,8 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
+
+print("DATABASE BEING USED:", app.config['SQLALCHEMY_DATABASE_URI'])
 
 with app.app_context():
     # import models after db is initialized to avoid circular imports
