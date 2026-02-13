@@ -33,16 +33,28 @@ def _unique_filename(original_filename: str) -> str:
     return f"{unique}{ext}"
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'data.db')
+
+# -------- DATABASE CONFIG (REPLACE THIS SECTION) --------
+database_url = os.environ.get("DATABASE_URL")
+
+if database_url:
+    # Fix Render postgres:// issue
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local fallback (keeps SQLite for development)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'data.db')
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {'check_same_thread': False},
+        'poolclass': NullPool,
+    }
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# SQLite engine options: allow connections across threads and avoid pooled writes
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'connect_args': { 'check_same_thread': False },
-    'poolclass': NullPool,
-}
+# ---------------------------------------------------------
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret')
-
 # initialize extensions
 db.init_app(app)
 login_manager = LoginManager()
