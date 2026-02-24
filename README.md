@@ -53,10 +53,6 @@ Notes & Limitations
 - The image-to-calorie mapping is heuristic: MobileNet class labels mapped to a small calorie table.
 - TensorFlow installation can be heavy; if you prefer, replace `estimate_calories` in `utils.py` with a call to an external image-recognition API (e.g., hosted ML service) and return a calorie mapping.
 
-Next steps you might want me to do:
-- Add user accounts and export data as CSV
-- Improve food-calorie mapping and portion-size estimation
-- Integrate a cloud vision API for better recognition
   
 - Uses Render to have website online. \/
 
