@@ -25,4 +25,22 @@
       Upload a clear photo of the main food item. The estimator uses filename heuristics — you can always override the calories manually.
     </div>
   </div>
+
+  {% if current_user.calorie_goal %}
+  <div class="card form-card" style="margin-top:16px;">
+    <div class="day-title">Today's progress</div>
+    {% set pct = [((today_total / current_user.calorie_goal) * 100)|int, 100]|min %}
+    {% set over = today_total > current_user.calorie_goal %}
+    <div class="goal-progress-labels">
+      <span>{{ today_total }} kcal consumed</span>
+      <span class="muted">Goal: {{ current_user.calorie_goal }} kcal</span>
+    </div>
+    <div class="goal-bar-wrap" style="margin-top:8px;">
+      <div class="goal-bar-fill {{ 'over' if over else '' }}" style="width:{{ pct }}%"></div>
+    </div>
+    <div class="muted" style="font-size:0.8rem;margin-top:6px;">
+      {% if over %}{{ today_total - current_user.calorie_goal }} kcal over goal{% else %}{{ current_user.calorie_goal - today_total }} kcal remaining{% endif %}
+    </div>
+  </div>
+  {% endif %}
 {% endblock %}

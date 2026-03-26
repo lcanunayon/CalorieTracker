@@ -717,6 +717,250 @@ body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Goal progress bar ───────────────────────── */
+.goal-progress-wrap {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-border);
+}
+
+.goal-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.goal-bar-wrap {
+  background: rgba(245, 166, 35, 0.14);
+  border-radius: 100px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.goal-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--gold), var(--amber));
+  transition: width 0.6s ease;
+}
+
+.goal-bar-fill.over {
+  background: linear-gradient(90deg, #e07010, #c0392b);
+}
+
+/* ── Calendar legend & cell bars ─────────────── */
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  flex-wrap: wrap;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-under { background: #4caf6e; }
+.dot-ok    { background: var(--gold); }
+.dot-over  { background: #c0392b; }
+
+.calendar-cell.cell-under { border-color: rgba(76, 175, 110, 0.4); background: rgba(76, 175, 110, 0.06); }
+.calendar-cell.cell-ok    { border-color: rgba(245, 166, 35, 0.5); background: rgba(245, 166, 35, 0.07); }
+.calendar-cell.cell-over  { border-color: rgba(192, 57, 43, 0.35); background: rgba(192, 57, 43, 0.05); }
+
+.cell-bar-wrap {
+  width: 100%;
+  height: 4px;
+  background: rgba(245, 166, 35, 0.15);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.cell-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--gold), var(--amber));
+}
+
+.cell-bar-fill.over { background: linear-gradient(90deg, #e07010, #c0392b); }
+
+/* ── Profile page ────────────────────────────── */
+.profile-page { padding-bottom: 60px; }
+
+.profile-hero {
+  margin-top: 36px;
+  padding: 32px;
+}
+
+.profile-hero-inner {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 4px solid var(--gold);
+  box-shadow: 0 0 0 5px rgba(245, 166, 35, 0.18), var(--shadow);
+  overflow: hidden;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.avatar-change-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--brown);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: background 0.18s, transform 0.18s;
+  border: 2px solid rgba(245,166,35,0.3);
+}
+
+.avatar-change-btn:hover {
+  background: var(--gold);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.profile-info { flex: 1; min-width: 200px; }
+
+.profile-username {
+  font-size: 1.9rem;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  color: var(--brown);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.profile-since {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+.profile-stats-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.profile-stat {
+  text-align: center;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(253,248,237,0.9));
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 14px;
+  min-width: 90px;
+}
+
+.profile-stat-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  color: var(--amber);
+  line-height: 1.2;
+}
+
+.profile-stat-label {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.profile-section-title {
+  font-size: 1.2rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: var(--brown);
+  margin: 30px 0 14px;
+}
+
+.profile-form-card { max-width: 680px; }
+
+.profile-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+
+.goal-result-banner {
+  margin-top: 24px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(253,248,237,0.9));
+  border: 2px solid rgba(245,166,35,0.35);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.goal-result-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.goal-result-value {
+  font-size: 2.4rem;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+  color: var(--amber);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.goal-result-sub {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 6px;
+}
+
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 800px) {
   .hero-inner      { flex-direction: column; }
@@ -727,7 +971,10 @@ body {
   .brand-text-sub  { display: none; }
   .main-nav        { gap: 1px; }
   .nav-link        { padding: 6px 10px; font-size: 0.82rem; }
-  .calendar-cell   { min-height: 58px; font-size: 0.8rem; }
-  .container       { padding: 0 16px; }
-  .page-heading    { font-size: 1.45rem; margin-top: 24px; }
+  .calendar-cell        { min-height: 58px; font-size: 0.8rem; }
+  .container            { padding: 0 16px; }
+  .page-heading         { font-size: 1.45rem; margin-top: 24px; }
+  .profile-hero-inner   { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .profile-fields-grid  { grid-template-columns: 1fr; }
+  .profile-username     { font-size: 1.5rem; }
 }

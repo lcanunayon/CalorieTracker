@@ -1,4 +1,5 @@
 Flask==2.2.5
+Werkzeug==2.3.8
 Flask-SQLAlchemy==3.0.4
 # Pin an older Pillow release with widely-available Windows wheels to avoid build issues
 Pillow==11.3.0

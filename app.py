@@ -186,8 +186,12 @@ def upload(meal):
         flash('Logged ' + meal)
         return redirect(url_for('index'))
 
-    today = datetime.date.today().isoformat()
-    return render_template('upload.html', meal=meal, date=today)
+    today = datetime.date.today()
+    today_entries = Entry.query.filter(
+        Entry.date == today.isoformat(), Entry.user_id == current_user.id
+    ).all()
+    today_total = sum(e.calories or 0 for e in today_entries)
+    return render_template('upload.html', meal=meal, date=today.isoformat(), today_total=today_total)
 
 
 @app.route('/uploads/<path:filename>')
@@ -281,6 +285,81 @@ def edit_entry(entry_id):
         return redirect(url_for('day_view', date=entry.date))
 
     return render_template('edit.html', entry=entry)
+
+
+_ACTIVITY_MULT = {
+    'sedentary':   1.2,
+    'light':       1.375,
+    'moderate':    1.55,
+    'active':      1.725,
+    'very_active': 1.9,
+}
+
+
+def _calc_calorie_goal(weight_kg, height_cm, age, sex, activity_level, goal_type):
+    """Mifflin-St Jeor BMR → TDEE → goal adjustment."""
+    if sex == 'male':
+        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
+    else:
+        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age - 161
+    tdee = bmr * _ACTIVITY_MULT.get(activity_level, 1.55)
+    if goal_type == 'lose':
+        return round(tdee - 300)
+    elif goal_type == 'gain':
+        return round(tdee + 300)
+    return round(tdee)
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    from models import Entry
+    if request.method == 'POST':
+        # Avatar upload
+        f = request.files.get('avatar')
+        if f and f.filename and _allowed_file(f.filename):
+            filename = _unique_filename(f.filename)
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            current_user.avatar_filename = filename
+
+        # Numeric / choice fields
+        for attr, cast in [('weight_kg', float), ('height_cm', float), ('age', int)]:
+            val = request.form.get(attr)
+            if val:
+                try:
+                    setattr(current_user, attr, cast(val))
+                except ValueError:
+                    pass
+
+        for attr in ('sex', 'activity_level', 'goal_type'):
+            val = request.form.get(attr)
+            if val:
+                setattr(current_user, attr, val)
+
+        # Recalculate goal if all fields present
+        u = current_user
+        if all([u.weight_kg, u.height_cm, u.age, u.sex, u.activity_level, u.goal_type]):
+            u.calorie_goal = _calc_calorie_goal(
+                u.weight_kg, u.height_cm, u.age, u.sex, u.activity_level, u.goal_type
+            )
+
+        db.session.commit()
+        flash('Profile saved')
+        return redirect(url_for('profile'))
+
+    # Stats for display
+    thirty_ago = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+    recent = Entry.query.filter(
+        Entry.user_id == current_user.id,
+        Entry.date >= thirty_ago
+    ).all()
+    daily = {}
+    for e in recent:
+        daily.setdefault(e.date, 0)
+        daily[e.date] += (e.calories or 0)
+    avg_calories = round(sum(daily.values()) / len(daily)) if daily else 0
+    total_entries = Entry.query.filter_by(user_id=current_user.id).count()
+    return render_template('profile.html', avg_calories=avg_calories, total_entries=total_entries)
 
 
 @app.route('/entry/<int:entry_id>/delete', methods=['POST'])

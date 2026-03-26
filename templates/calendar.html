@@ -9,6 +9,15 @@
     <a href="/calendar?year={{ year + 1 }}&month={{ month }}">Next Year &raquo;</a>
   </div>
 
+  {% if current_user.calorie_goal %}
+  <div class="calendar-legend">
+    <span class="legend-dot dot-under"></span> Under goal
+    <span class="legend-dot dot-ok"></span> At goal
+    <span class="legend-dot dot-over"></span> Over goal
+    <span class="muted" style="margin-left:10px;font-size:0.8rem;">Goal: {{ current_user.calorie_goal }} kcal/day</span>
+  </div>
+  {% endif %}
+
   <div class="card calendar-grid">
     <div class="calendar-head">
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
@@ -16,13 +25,30 @@
     <div class="calendar-body">
       {% for week in weeks %}
         {% for day in week %}
-          <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}" href="/day/{{ day.date.isoformat() }}">
+          {% set goal = current_user.calorie_goal %}
+          {% if goal and day.total > 0 %}
+            {% if day.total > goal %}
+              {% set cell_class = 'cell-over' %}
+            {% elif day.total >= goal * 0.85 %}
+              {% set cell_class = 'cell-ok' %}
+            {% else %}
+              {% set cell_class = 'cell-under' %}
+            {% endif %}
+          {% else %}
+            {% set cell_class = '' %}
+          {% endif %}
+          <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }} {{ cell_class }}" href="/day/{{ day.date.isoformat() }}">
             <div class="cell-top">
               <span class="daynum">{{ day.date.day }}</span>
               {% if day.total > 0 %}
                 <span class="total">{{ day.total }}</span>
               {% endif %}
             </div>
+            {% if goal and day.total > 0 %}
+              <div class="cell-bar-wrap">
+                <div class="cell-bar-fill {{ 'over' if day.total > goal else '' }}" style="width:{{ [((day.total / goal) * 100)|int, 100]|min }}%"></div>
+              </div>
+            {% endif %}
           </a>
         {% endfor %}
       {% endfor %}

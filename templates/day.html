@@ -23,6 +23,21 @@
       <span class="label">Total</span>
       <span class="value">{{ totals.breakfast + totals.lunch + totals.dinner }} kcal</span>
     </div>
+    {% if current_user.calorie_goal %}
+      {% set consumed = totals.breakfast + totals.lunch + totals.dinner %}
+      {% set over = consumed > current_user.calorie_goal %}
+      <div class="goal-progress-wrap">
+        <div class="goal-progress-labels">
+          <span class="muted" style="font-size:0.8rem;">Goal: {{ current_user.calorie_goal }} kcal</span>
+          <span class="muted" style="font-size:0.8rem;">
+            {% if over %}{{ consumed - current_user.calorie_goal }} over{% else %}{{ current_user.calorie_goal - consumed }} remaining{% endif %}
+          </span>
+        </div>
+        <div class="goal-bar-wrap">
+          <div class="goal-bar-fill {{ 'over' if over else '' }}" style="width:{{ [((consumed / current_user.calorie_goal) * 100)|int, 100]|min }}%"></div>
+        </div>
+      </div>
+    {% endif %}
   </div>
 
   <div class="quick-add">
