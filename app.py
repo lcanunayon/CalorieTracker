@@ -64,6 +64,60 @@ login_manager.init_app(app)
 
 print("DATABASE BEING USED:", app.config['SQLALCHEMY_DATABASE_URI'])
 
+
+@app.context_processor
+def goal_color_helpers():
+    """
+    Inject goal_bar_color(consumed, goal) and goal_bg_color(consumed, goal)
+    into every template.
+
+    Color logic (same for both):
+      diff = consumed - goal
+      diff <= -500          → grey (no progress tint)
+      -500 < diff <= 0      → grey fading to green as diff approaches 0
+      0 < diff <= 500       → green fading to red as diff grows
+      diff > 500            → full red
+    """
+    def _hsl_for_diff(diff):
+        if diff <= -500:
+            return None                              # grey — no tint
+        elif diff <= 0:
+            t = (diff + 500) / 500                  # 0 → 1 as diff goes -500 → 0
+            sat = int(t * 78)
+            return f'hsl(120,{sat}%,42%)'
+        elif diff <= 500:
+            t = diff / 500                          # 0 → 1 as diff goes 0 → +500
+            hue = int(120 * (1 - t))
+            return f'hsl({hue},78%,42%)'
+        else:
+            return 'hsl(0,78%,42%)'                 # full red
+
+    def goal_bar_color(consumed, goal):
+        if not goal:
+            return 'hsl(0,0%,72%)'
+        color = _hsl_for_diff(consumed - goal)
+        return color if color else 'hsl(0,0%,72%)'
+
+    def goal_bg_color(consumed, goal):
+        """Same hue logic but very translucent — for cell backgrounds."""
+        if not goal or not consumed:
+            return None
+        diff = consumed - goal
+        if diff <= -500:
+            return None
+        elif diff <= 0:
+            t = (diff + 500) / 500
+            sat = int(t * 60)
+            return f'hsla(120,{sat}%,45%,0.10)'
+        elif diff <= 500:
+            t = diff / 500
+            hue = int(120 * (1 - t))
+            return f'hsla({hue},70%,45%,0.10)'
+        else:
+            return 'hsla(0,70%,45%,0.10)'
+
+    return dict(goal_bar_color=goal_bar_color, goal_bg_color=goal_bg_color)
+
 with app.app_context():
     # import models after db is initialized to avoid circular imports
     from models import Entry, User
@@ -206,14 +260,15 @@ def upload(meal):
         db.session.add(entry)
         db.session.commit()
         flash('Logged ' + meal)
-        return redirect(url_for('index'))
+        return redirect(url_for('day_view', date=date_str))
 
-    today = datetime.date.today()
-    today_entries = Entry.query.filter(
-        Entry.date == today.isoformat(), Entry.user_id == current_user.id
+    # Respect ?date= query param so logging from a past/future day works correctly
+    date_str = request.args.get('date') or datetime.date.today().isoformat()
+    day_entries = Entry.query.filter(
+        Entry.date == date_str, Entry.user_id == current_user.id
     ).all()
-    today_total = sum(e.calories or 0 for e in today_entries)
-    return render_template('upload.html', meal=meal, date=today.isoformat(), today_total=today_total)
+    day_total = sum(e.calories or 0 for e in day_entries)
+    return render_template('upload.html', meal=meal, date=date_str, today_total=day_total)
 
 
 @app.route('/uploads/<path:filename>')

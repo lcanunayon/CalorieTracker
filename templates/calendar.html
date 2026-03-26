@@ -26,18 +26,10 @@
       {% for week in weeks %}
         {% for day in week %}
           {% set goal = current_user.calorie_goal %}
-          {% if goal and day.total > 0 %}
-            {% if day.total > goal %}
-              {% set cell_class = 'cell-over' %}
-            {% elif day.total >= goal * 0.85 %}
-              {% set cell_class = 'cell-ok' %}
-            {% else %}
-              {% set cell_class = 'cell-under' %}
-            {% endif %}
-          {% else %}
-            {% set cell_class = '' %}
-          {% endif %}
-          <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }} {{ cell_class }}" href="/day/{{ day.date.isoformat() }}">
+          {% set bg = goal_bg_color(day.total, goal) if (goal and day.total > 0) else None %}
+          <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}"
+             href="/day/{{ day.date.isoformat() }}"
+             {% if bg %}style="background:{{ bg }}; border-color:{{ bg }}"{% endif %}>
             <div class="cell-top">
               <span class="daynum">{{ day.date.day }}</span>
               {% if day.total > 0 %}
@@ -46,7 +38,7 @@
             </div>
             {% if goal and day.total > 0 %}
               <div class="cell-bar-wrap">
-                <div class="cell-bar-fill {{ 'over' if day.total > goal else '' }}" style="width:{{ [((day.total / goal) * 100)|int, 100]|min }}%"></div>
+                <div class="cell-bar-fill" style="width:{{ [((day.total / goal) * 100)|int, 100]|min }}%; background:{{ goal_bar_color(day.total, goal) }}"></div>
               </div>
             {% endif %}
           </a>

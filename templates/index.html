@@ -35,16 +35,15 @@
           {% if current_user.calorie_goal %}
             {% set consumed = totals.breakfast + totals.lunch + totals.dinner %}
             {% set pct = [((consumed / current_user.calorie_goal) * 100)|int, 100]|min %}
-            {% set over = consumed > current_user.calorie_goal %}
             <div class="goal-progress-wrap">
               <div class="goal-progress-labels">
                 <span class="muted" style="font-size:0.8rem;">Goal: {{ current_user.calorie_goal }} kcal</span>
                 <span class="muted" style="font-size:0.8rem;">
-                  {% if over %}{{ consumed - current_user.calorie_goal }} over{% else %}{{ current_user.calorie_goal - consumed }} remaining{% endif %}
+                  {% if consumed > current_user.calorie_goal %}{{ consumed - current_user.calorie_goal }} over{% else %}{{ current_user.calorie_goal - consumed }} remaining{% endif %}
                 </span>
               </div>
               <div class="goal-bar-wrap">
-                <div class="goal-bar-fill {{ 'over' if over else '' }}" style="width:{{ [((consumed / current_user.calorie_goal) * 100)|int, 100]|min }}%"></div>
+                <div class="goal-bar-fill" style="width:{{ pct }}%; background:{{ goal_bar_color(consumed, current_user.calorie_goal) }}"></div>
               </div>
             </div>
           {% endif %}

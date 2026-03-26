@@ -746,12 +746,8 @@ body {
 .goal-bar-fill {
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, var(--gold), var(--amber));
-  transition: width 0.6s ease;
-}
-
-.goal-bar-fill.over {
-  background: linear-gradient(90deg, #e07010, #c0392b);
+  transition: width 0.6s ease, background 0.6s ease;
+  /* color applied inline via goal_bar_color() */
 }
 
 /* ── Calendar legend & cell bars ─────────────── */
@@ -782,10 +778,6 @@ body {
 .dot-ok    { background: #4caf6e; }   /* green — at goal    */
 .dot-over  { background: #c0392b; }   /* red  — over goal   */
 
-.calendar-cell.cell-under { border-color: rgba(201, 169, 110, 0.45); background: rgba(201, 169, 110, 0.07); }
-.calendar-cell.cell-ok    { border-color: rgba(76,  175, 110, 0.45); background: rgba(76,  175, 110, 0.07); }
-.calendar-cell.cell-over  { border-color: rgba(192,  57,  43, 0.35); background: rgba(192,  57,  43, 0.05); }
-
 .cell-bar-wrap {
   width: 100%;
   height: 4px;
@@ -798,10 +790,8 @@ body {
 .cell-bar-fill {
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, #4caf6e, #2e9e5b);  /* green for at/under */
+  /* color applied inline via goal_bar_color() */
 }
-
-.cell-bar-fill.over { background: linear-gradient(90deg, #e07010, #c0392b); }
 
 /* ── Profile page ────────────────────────────── */
 .profile-page { padding-bottom: 60px; }
