@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Login</h2>
-  <div class="card form-card" style="max-width:420px;">
-    <form method="post">
-      <label>Username
-        <input type="text" name="username" required>
-      </label>
-      <label>Password
-        <input type="password" name="password" required>
-      </label>
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Login</button>
-        <a class="btn btn-ghost" href="/register">Register</a>
-      </div>
-    </form>
+  <div class="auth-wrap">
+    <div class="auth-card card form-card">
+      <div class="auth-title">Welcome back</div>
+      <p class="auth-sub">Sign in to continue tracking your meals.</p>
+      <form method="post">
+        <label>Username
+          <input type="text" name="username" required autocomplete="username">
+        </label>
+        <label>Password
+          <input type="password" name="password" required autocomplete="current-password">
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Login</button>
+          <a class="btn btn-ghost" href="/register">Create account</a>
+        </div>
+      </form>
+    </div>
   </div>
 {% endblock %}

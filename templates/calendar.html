@@ -1,40 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <style>
-    .calendar-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .calendar-nav a {
-      background-color: #ffffff;
-      color: var(--accent);
-      border: 3px solid var(--accent);
-      border-radius: 8px;
-      padding: 50px 12px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background-color 0.2s, box-shadow 0.2s;
-      box-shadow: var(--shadow);
-    }
-    .calendar-nav a:hover {
-      background-color: var(--accent);
-      color: #ffffff;
-    }
-  </style>
-
   <div class="calendar-nav">
-    <a href="/calendar?year={{ year - 1 }}&month={{ month }}">&laquo; Previous Year</a>
-    <a href="/calendar?year={{ year }}&month={{ month - 1 if month > 1 else 12 }}&year_adjust={{ year - 1 if month == 1 else year }}">&laquo; Previous Month</a>
-    <span>{{ year }}-{{ '%02d'|format(month) }}</span>
-    <a href="/calendar?year={{ year }}&month={{ month + 1 if month < 12 else 1 }}&year_adjust={{ year + 1 if month == 12 else year }}">Next Month &raquo;</a>
+    <a href="/calendar?year={{ year - 1 }}&month={{ month }}">&laquo; Prev Year</a>
+    <a href="/calendar?year={{ year if month > 1 else year - 1 }}&month={{ month - 1 if month > 1 else 12 }}">&lsaquo; Prev Month</a>
+    <span class="calendar-month-label">{{ year }} — {{ '%02d'|format(month) }}</span>
+    <a href="/calendar?year={{ year if month < 12 else year + 1 }}&month={{ month + 1 if month < 12 else 1 }}">Next Month &rsaquo;</a>
     <a href="/calendar?year={{ year + 1 }}&month={{ month }}">Next Year &raquo;</a>
   </div>
 
-  <h2>Calendar — {{ year }}-{{ '%02d'|format(month) }}</h2>
-  <div class="calendar-grid card">
+  <div class="card calendar-grid">
     <div class="calendar-head">
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
@@ -44,12 +19,13 @@
           <a class="calendar-cell {{ 'other-month' if day.date.month != month else '' }}" href="/day/{{ day.date.isoformat() }}">
             <div class="cell-top">
               <span class="daynum">{{ day.date.day }}</span>
-              <span class="total">{{ day.total }} kcal</span>
+              {% if day.total > 0 %}
+                <span class="total">{{ day.total }}</span>
+              {% endif %}
             </div>
           </a>
         {% endfor %}
       {% endfor %}
     </div>
   </div>
-
 {% endblock %}

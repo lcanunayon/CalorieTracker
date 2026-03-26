@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Log {{ meal.title() }}</h2>
+  <h2 class="page-heading">Log {{ meal.title() }}</h2>
   <div class="card form-card">
     <form method="post" enctype="multipart/form-data">
       <label>Date
@@ -10,18 +10,19 @@
       <label>Photo
         <input type="file" name="photo" accept="image/*">
       </label>
-      <label>Manual Calories (optional)
-        <input type="number" name="manual_cal">
+      <label>Manual Calories <span class="muted" style="font-weight:400;">(optional)</span>
+        <input type="number" name="manual_cal" placeholder="e.g. 450">
       </label>
       <label>Notes
-        <input type="text" name="notes">
+        <input type="text" name="notes" placeholder="e.g. with oat milk">
       </label>
       <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-primary" type="submit">Save entry</button>
         <a class="btn btn-ghost" href="/">Cancel</a>
       </div>
     </form>
+    <div class="form-tip">
+      Upload a clear photo of the main food item. The estimator uses filename heuristics — you can always override the calories manually.
+    </div>
   </div>
-
-  <p class="muted">Tip: Upload a clear photo of the main food item. The estimator uses filename heuristics; you can override calories manually.</p>
 {% endblock %}

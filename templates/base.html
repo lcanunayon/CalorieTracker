@@ -3,24 +3,37 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Calorie Tracker</title>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Sunflower - a Calorie Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <meta name="theme-color" content="#8f5009">
+    <meta name="theme-color" content="#f5a623">
   </head>
   <body>
+    <!-- Animated background -->
+    <div class="bg-canvas"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
     <div id="site-root" class="page-enter">
       <header class="site-header">
         <div class="container header-inner">
-          <h1 class="brand"><a href="/">Sunflower<span> - a Calorie Tracker</span></a></h1>
+          <h1 class="brand">
+            <a href="/">
+              <span class="brand-sun"></span>
+              Sunflower
+              <span class="brand-text-sub">— a Calorie Tracker</span>
+            </a>
+          </h1>
           <nav class="main-nav">
             <a class="nav-link" href="/upload/breakfast">Breakfast</a>
             <a class="nav-link" href="/upload/lunch">Lunch</a>
             <a class="nav-link" href="/upload/dinner">Dinner</a>
             <a class="nav-link" href="/calendar">Calendar</a>
             {% if current_user.is_authenticated %}
-              <a class="nav-link" href="#">{{ current_user.username }}</a>
+              <a class="nav-link nav-user" href="#">{{ current_user.username }}</a>
               <a class="nav-link" href="/logout">Logout</a>
             {% else %}
               <a class="nav-link" href="/login">Login</a>
@@ -46,8 +59,8 @@
       </main>
 
       <footer class="site-footer">
-        <div class="container">
-          <small>Prototype — image estimation uses heuristics. Feel free to improve the model.</small>
+        <div class="container footer-inner">
+          <small>Prototype — image estimation uses heuristics.</small>
           <small>Created by Angelo Canunayon</small>
         </div>
       </footer>
@@ -55,13 +68,12 @@
 
     <script src="/static/app.js" defer></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         const overlay = document.createElement('div');
         overlay.className = 'loading-overlay';
         overlay.innerHTML = '<div class="loading-spinner"></div>';
         document.body.appendChild(overlay);
-
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
           overlay.style.display = 'none';
         });
       });
