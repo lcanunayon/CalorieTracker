@@ -75,6 +75,28 @@ with app.app_context():
         traceback.print_exc()
         print('WARNING: could not create DB schema automatically:', e)
 
+    # Migrate: add profile columns to existing user tables that predate them.
+    # Uses IF NOT EXISTS so it's safe to run on every startup.
+    _profile_columns = [
+        ('avatar_filename', 'VARCHAR(200)'),
+        ('weight_kg',       'FLOAT'),
+        ('height_cm',       'FLOAT'),
+        ('age',             'INTEGER'),
+        ('sex',             'VARCHAR(10)'),
+        ('activity_level',  'VARCHAR(20)'),
+        ('goal_type',       'VARCHAR(20)'),
+        ('calorie_goal',    'INTEGER'),
+    ]
+    try:
+        with db.engine.connect() as _conn:
+            for _col, _type in _profile_columns:
+                _conn.execute(db.text(
+                    f'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS {_col} {_type}'
+                ))
+            _conn.commit()
+    except Exception:
+        pass  # SQLite doesn't support IF NOT EXISTS — handled by create_all above
+
 
 @login_manager.user_loader
 def load_user(user_id):
