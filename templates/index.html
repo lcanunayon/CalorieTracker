@@ -86,9 +86,7 @@
       <div class="entries-grid">
         {% for e in entries %}
           <article class="entry card">
-            {% if e.image_filename %}
-              <img class="entry-photo" src="/uploads/{{ e.image_filename }}" alt="photo">
-            {% endif %}
+            <img class="entry-photo" src="{{ '/uploads/' + e.image_filename if e.image_filename else '/static/Assets/silouette.jpg' }}" alt="photo">
             <div class="entry-body">
               <div class="entry-top">
                 <div class="entry-meal">{{ e.meal.title() }}</div>
